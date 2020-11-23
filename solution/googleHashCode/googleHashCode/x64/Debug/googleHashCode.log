@@ -1,0 +1,5 @@
+﻿  Server.cpp
+  googleHashCode.cpp
+C:\projects\hashCode2019\solution\googleHashCode\googleHashCode\googleHashCode.cpp(93,13): warning C4326: return type of 'main' should be 'int' instead of 'void'
+  Generating Code...
+  googleHashCode.vcxproj -> C:\projects\hashCode2019\solution\googleHashCode\x64\Debug\googleHashCode.exe
