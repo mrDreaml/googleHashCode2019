@@ -6,26 +6,30 @@
 
 using namespace std;
 
+struct cf {
+	string name;
+	unsigned int score;
+};
+
 class Server {
 	private:
 		unsigned int serverTime = 0;
-		vector<string> compiledFiles;
+		vector<cf> compiledFiles;
 		map<string, unsigned int> replicationDeadLine;
 
 		void calculateServerTime(compileDataNode& file, unsigned int replicationTotalTime) {
 			serverTime += file.compileTime + replicationTotalTime;
 		}
 
-	public:
-		unsigned int getServerTime() { return serverTime; }
-
 		bool isServerContainFile(string fileName) {
 			return replicationDeadLine.find(fileName) != replicationDeadLine.end();
 		}
+	public:
+		unsigned int getServerTime() { return serverTime; }
 
 		int getReplicationTimeForFile(string fileName) {
 			if (isServerContainFile(fileName)) {
-				unsigned int currentDeadLine = replicationDeadLine[fileName] - getServerTime();
+				unsigned int currentDeadLine = replicationDeadLine[fileName] - serverTime;
 				return currentDeadLine < 0 ? 0 : currentDeadLine;
 			}
 			return -1;
@@ -33,9 +37,25 @@ class Server {
 
 		void bindFile (compileDataNode &file, unsigned int replicationTotalTime) {
 			calculateServerTime(file, replicationTotalTime);
-			compiledFiles.push_back(file.name);
-			replicationDeadLine[file.name] = getServerTime() + file.replicateTime;
+			cf s;
+			s.name = file.name;
+			s.score = 0;
+			if (file.deadlineTime != NO_COMPILED_DATA_INFO) {
+				int delta = file.deadlineTime - serverTime;
+				if (delta > 0) {
+					s.score += delta + file.goalPoints;
+				}
+			}
+
+			compiledFiles.push_back(s);
+			replicationDeadLine[file.name] = serverTime + file.replicateTime;
 		}
 
-
+		unsigned int calcSummuryScore() {
+			unsigned int res = 0;
+			for (cf s : compiledFiles) {
+				res += s.score;
+			}
+			return res;
+		}
 };

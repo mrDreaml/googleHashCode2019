@@ -11,6 +11,7 @@ using namespace std;
 
 const string SELECTED_INPUT_FILE_PATH = "..//inputData//a_example.in";
 const string SELECTED_OUTPUT_FILE_PATH = "..//outputData/output.out";
+const string SUBMITION_FILE_PATH = "..//outputData//submitionExample.out";
 
 vector<string> readFromFile(const string& filePath) {
     ifstream file(filePath);
@@ -41,7 +42,7 @@ vector<string> getStringTokens(string& line) {
     return tokens;
 }
 
-void parseData(const vector<string> &inputFileData, totalFileInfo &info, map<string, compileDataNode> &compiledData, map<string, vector<string>> &compiledDataDeps) {
+void parseInputData(const vector<string> &inputFileData, totalFileInfo &info, map<string, compileDataNode> &compiledData, map<string, vector<string>> &compiledDataDeps) {
     unsigned int i = 0;
     compileDataNode node;
     string fileName;
@@ -77,6 +78,19 @@ void parseData(const vector<string> &inputFileData, totalFileInfo &info, map<str
     }
 }
 
+unsigned int parseOutputData(const vector<string> &fileData, vector<submitionResultNode> &submitionResult) {
+    unsigned int compilationStepsQ = stoi(fileData[0]);
+    for (auto it = fileData.begin() + 1; it < fileData.end(); it++) {
+        string line = *it;
+        vector<string> tokens = getStringTokens(line);
+        submitionResultNode node;
+        node.name = tokens[0];
+        node.serverId = stoi(tokens[1]);
+        submitionResult.push_back(node);
+    }
+    return compilationStepsQ;
+}
+
 bool isCanBeCompiled(string targetName, map<string, vector<string>> &deps) {
     vector<string> depsV = deps[targetName];
     if (!depsV.empty()) {
@@ -95,13 +109,18 @@ void main() {
     map<string, compileDataNode> compiledData;
     map<string, vector<string>> compiledDataDeps;
     vector<string> inputFileData = readFromFile(SELECTED_INPUT_FILE_PATH);
-    parseData(inputFileData, info, compiledData, compiledDataDeps);
+    parseInputData(inputFileData, info, compiledData, compiledDataDeps);
 
-    Server s;
-    Server s2;
-    s2.bindFile(compiledData["c0"], 10);
+    vector<Server> servers;
+    for (unsigned int i = 0; i < info.serversQ; i++) {
+        Server s;
+        servers.push_back(s);
+    }
 
-    cout << endl << s.getServerTime() << " " << s2.getServerTime();
+    vector<submitionResultNode> submitionResult;
+    parseOutputData(readFromFile(SUBMITION_FILE_PATH), submitionResult);
+
+    cout << endl << servers[0].getServerTime() << " " << servers[1].getServerTime();
 
     // vector<string> d = { "7", "c0 1" };
     //writeToFile(SELECTED_OUTPUT_FILE_PATH, d);
