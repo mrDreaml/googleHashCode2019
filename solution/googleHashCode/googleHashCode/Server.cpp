@@ -1,3 +1,4 @@
+#include "Server.h"
 #include "Common.h"
 
 #include <map>
@@ -6,56 +7,44 @@
 
 using namespace std;
 
-struct cf {
-	string name;
-	unsigned int score;
-};
+void Server::calculateServerTime(compileDataNode& file, unsigned int replicationTotalTime) {
+	serverTime += file.compileTime + replicationTotalTime;
+	serverTime;
+}
 
-class Server {
-	private:
-		unsigned int serverTime = 0;
-		vector<cf> compiledFiles;
-		map<string, unsigned int> replicationDeadLine;
+unsigned int Server::getServerTime() { return serverTime; }
 
-		void calculateServerTime(compileDataNode& file, unsigned int replicationTotalTime) {
-			serverTime += file.compileTime + replicationTotalTime;
+bool Server::isServerContainFile(string fileName) {
+	return replicationDeadLine.find(fileName) != replicationDeadLine.end();
+}
+
+unsigned int Server::getReplicationTimeForFile(string fileName) {
+		int currentDeadLine = replicationDeadLine[fileName] - serverTime;
+		return currentDeadLine < 0 ? 0 : currentDeadLine;
+
+}
+
+void Server::bindFile (compileDataNode &file, unsigned int replicationTotalTime) {
+	calculateServerTime(file, replicationTotalTime);
+	serverTime;
+	scoreNode s;
+	s.name = file.name;
+	s.score = 0;
+	if (file.deadlineTime != NO_COMPILED_DATA_INFO) {
+		int delta = file.deadlineTime - serverTime;
+		if (delta >= 0) {
+			s.score += delta + file.goalPoints;
 		}
+	}
 
-		bool isServerContainFile(string fileName) {
-			return replicationDeadLine.find(fileName) != replicationDeadLine.end();
-		}
-	public:
-		unsigned int getServerTime() { return serverTime; }
+	compiledFiles.push_back(s);
+	replicationDeadLine[file.name] = serverTime + file.replicateTime;
+}
 
-		int getReplicationTimeForFile(string fileName) {
-			if (isServerContainFile(fileName)) {
-				unsigned int currentDeadLine = replicationDeadLine[fileName] - serverTime;
-				return currentDeadLine < 0 ? 0 : currentDeadLine;
-			}
-			return -1;
-		}
-
-		void bindFile (compileDataNode &file, unsigned int replicationTotalTime) {
-			calculateServerTime(file, replicationTotalTime);
-			cf s;
-			s.name = file.name;
-			s.score = 0;
-			if (file.deadlineTime != NO_COMPILED_DATA_INFO) {
-				int delta = file.deadlineTime - serverTime;
-				if (delta > 0) {
-					s.score += delta + file.goalPoints;
-				}
-			}
-
-			compiledFiles.push_back(s);
-			replicationDeadLine[file.name] = serverTime + file.replicateTime;
-		}
-
-		unsigned int calcSummuryScore() {
-			unsigned int res = 0;
-			for (cf s : compiledFiles) {
-				res += s.score;
-			}
-			return res;
-		}
-};
+unsigned int Server::calcSummuryScore() {
+	unsigned int res = 0;
+	for (auto s : compiledFiles) {
+		res += s.score;
+	}
+	return res;
+}

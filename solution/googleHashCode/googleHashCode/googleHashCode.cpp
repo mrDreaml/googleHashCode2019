@@ -5,7 +5,8 @@
 #include <vector>
 
 #include "Common.h"
-#include "Server.cpp"
+#include "Server.h"
+#include "ServerManager.h"
 
 using namespace std;
 
@@ -103,25 +104,25 @@ bool isCanBeCompiled(string targetName, map<string, vector<string>> &deps) {
     return true;
 }
 
+void startServersBySubmitionData (unsigned int serversQ, vector<submitionResultNode> submitionResults, map<string, compileDataNode> compiledData, map<string, vector<string>> compiledDataDeps) {
+    ServerManager sManager(serversQ);
+    for (submitionResultNode submitionResult : submitionResults) {
+        sManager.bindFileToServer(compiledData[submitionResult.name], submitionResult.serverId, compiledData, compiledDataDeps);
+    }
+    sManager;
+}
 
-void main() {
+
+int main() {
     totalFileInfo info;
     map<string, compileDataNode> compiledData;
     map<string, vector<string>> compiledDataDeps;
     vector<string> inputFileData = readFromFile(SELECTED_INPUT_FILE_PATH);
     parseInputData(inputFileData, info, compiledData, compiledDataDeps);
 
-    vector<Server> servers;
-    for (unsigned int i = 0; i < info.serversQ; i++) {
-        Server s;
-        servers.push_back(s);
-    }
-
-    vector<submitionResultNode> submitionResult;
-    parseOutputData(readFromFile(SUBMITION_FILE_PATH), submitionResult);
-
-    cout << endl << servers[0].getServerTime() << " " << servers[1].getServerTime();
-
+    vector<submitionResultNode> submitionResults;
+    parseOutputData(readFromFile(SUBMITION_FILE_PATH), submitionResults);
+    startServersBySubmitionData(info.serversQ, submitionResults, compiledData, compiledDataDeps);
     // vector<string> d = { "7", "c0 1" };
     //writeToFile(SELECTED_OUTPUT_FILE_PATH, d);
 }

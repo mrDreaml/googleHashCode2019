@@ -1,8 +1,10 @@
-#include <map>
-#include <sstream>
 #pragma once
 
+#include <map>
+#include <sstream>
+
 const int NO_COMPILED_DATA_INFO = -1;
+const int EMPTY = -1;
 
 using namespace std;
 
