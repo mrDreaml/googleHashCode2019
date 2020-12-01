@@ -9,7 +9,6 @@ using namespace std;
 
 void Server::calculateServerTime(compileDataNode& file, unsigned int replicationTotalTime) {
 	serverTime += file.compileTime + replicationTotalTime;
-	serverTime;
 }
 
 unsigned int Server::getServerTime() { return serverTime; }
@@ -26,7 +25,9 @@ unsigned int Server::getReplicationTimeForFile(string fileName) {
 
 void Server::bindFile (compileDataNode &file, unsigned int replicationTotalTime) {
 	calculateServerTime(file, replicationTotalTime);
-	serverTime;
+	if (isServerContainFile(file.name)) {
+		return; // compilation the smae file
+	}
 	scoreNode s;
 	s.name = file.name;
 	s.score = 0;

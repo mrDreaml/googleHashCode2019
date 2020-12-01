@@ -13,6 +13,22 @@ ServerManager::ServerManager(unsigned int serversQ) {
     }
 };
 
+unsigned int ServerManager::calcSummaryScore() {
+    unsigned int summaryScore = 0;
+    for (Server server : servers) {
+        summaryScore += server.calcSummuryScore();
+    }
+    return summaryScore;
+}
+
+vector<unsigned int> ServerManager::getServersTime() {
+    vector<unsigned int> result;
+    for (Server server : servers) {
+        result.push_back(server.getServerTime());
+    }
+    return result;
+}
+
 void ServerManager::bindFileToServer (compileDataNode& file, unsigned int serverId, map<string, compileDataNode> compiledData, map<string, vector<string>> compiledDataDeps) {
     unsigned int replicationTotalTime = calculateReplicationTime(file.name, serverId, compiledData, compiledDataDeps);
     servers[serverId].bindFile(file, replicationTotalTime);

@@ -1,6 +1,2 @@
-﻿  Server.cpp
-  ServerManager.cpp
-C:\projects\hashCode2019\solution\googleHashCode\googleHashCode\ServerManager.cpp(31,81): warning C4018: '>': signed/unsigned mismatch
-  googleHashCode.cpp
-  Generating Code...
+﻿  googleHashCode.cpp
   googleHashCode.vcxproj -> C:\projects\hashCode2019\solution\googleHashCode\x64\Debug\googleHashCode.exe

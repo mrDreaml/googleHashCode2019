@@ -2,6 +2,8 @@
 
 #include <map>
 #include <sstream>
+#include <vector>
+#include <map>
 
 const int NO_COMPILED_DATA_INFO = -1;
 const int EMPTY = -1;
