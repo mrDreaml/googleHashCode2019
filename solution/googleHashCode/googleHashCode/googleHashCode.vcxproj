@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GeneticAlgorithm.cpp" />
     <ClCompile Include="googleHashCode.cpp" />
     <ClCompile Include="InputOutput.cpp" />
     <ClCompile Include="Server.cpp" />
@@ -146,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
+    <ClInclude Include="GeneticAlgorithm.h" />
     <ClInclude Include="InputOutput.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="ServerManager.h" />

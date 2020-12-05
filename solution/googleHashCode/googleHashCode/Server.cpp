@@ -17,8 +17,8 @@ bool Server::isServerContainFile(string fileName) {
 	return replicationDeadLine.find(fileName) != replicationDeadLine.end();
 }
 
-unsigned int Server::getReplicationTimeForFile(string fileName) {
-		int currentDeadLine = replicationDeadLine[fileName] - serverTime;
+unsigned int Server::getReplicationTimeForFile(string fileName, unsigned int otherServerTime) {
+		int currentDeadLine = replicationDeadLine[fileName] - otherServerTime;
 		return currentDeadLine < 0 ? 0 : currentDeadLine;
 
 }

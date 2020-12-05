@@ -42,7 +42,7 @@ unsigned int ServerManager::calculateReplicationTime(const string fileName, unsi
         for (unsigned int i = 0; i < servers.size(); i++) {
             if (servers[i].isServerContainFile(depFileName)) {
                 if (serverId != i) {
-                    unsigned int tmp = servers[i].getReplicationTimeForFile(depFileName);
+                    unsigned int tmp = servers[i].getReplicationTimeForFile(depFileName, servers[serverId].getServerTime());
                     if (currentFileReplicationTime != EMPTY) {
                         currentFileReplicationTime = currentFileReplicationTime > tmp ? tmp : currentFileReplicationTime;
                     } else {

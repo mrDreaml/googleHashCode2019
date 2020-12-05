@@ -6,6 +6,7 @@
 #include "InputOutput.h"
 #include "Server.h"
 #include "ServerManager.h"
+#include "GeneticAlgorithm.h"
 
 const string SELECTED_INPUT_FILE_PATH = "..//inputData//a_example.in";
 const string SELECTED_OUTPUT_FILE_PATH = "..//outputData/output.out";
@@ -27,15 +28,18 @@ void startServersBySubmitionData (unsigned int serversQ, vector<submitionResultN
 
 
 int main() {
+    srand(time(NULL)); // allows to generate new random values
     totalFileInfo info;
     map<string, compileDataNode> compiledData;
     map<string, vector<string>> compiledDataDeps;
     parseInputData(readFromFile(SELECTED_INPUT_FILE_PATH), info, compiledData, compiledDataDeps);
 
     vector<submitionResultNode> submitionResults;
-    parseOutputData(readFromFile(SUBMITION_FILE_PATH), submitionResults);
-
+    parseOutputData(readFromFile(SUBMITION_FILE_PATH /*SELECTED_OUTPUT_FILE_PATH*/), submitionResults);
     startServersBySubmitionData(info.serversQ, submitionResults, compiledData, compiledDataDeps);
+
+    //GeneticAlgorithm ga = GeneticAlgorithm(compiledData, compiledDataDeps, info.serversQ);
+    //ga.start(100, 3);
 
     // vector<string> d = { "7", "c0 1" };
     //writeToFile(SELECTED_OUTPUT_FILE_PATH, d);

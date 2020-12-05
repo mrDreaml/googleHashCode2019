@@ -22,7 +22,7 @@ private:
 public:
 	unsigned int getServerTime();
 	bool isServerContainFile(string fileName);
-	unsigned int getReplicationTimeForFile(string fileName);
+	unsigned int getReplicationTimeForFile(string fileName, unsigned int);
 	void bindFile(compileDataNode& file, unsigned int replicationTotalTime);
 	unsigned int calcSummuryScore();
 };
