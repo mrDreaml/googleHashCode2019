@@ -51,12 +51,12 @@ void GeneticAlgorithm::mutateSingle(weighedPopulationT& weighedPopulation) {
 	unsigned int id = rand() % weighedPopulation.size();
 	chromosomeWithWeight* selectedChromosome = &weighedPopulation[id];
 	chromosomeT* chromosome = &selectedChromosome->chromosome;
-	for (genT gen : *chromosome) {
+	for (genT& gen : *chromosome) {
 		if (rand() % 2 == 0) {
 			gen.serverId = rand() % _serversQ;
 		}
 	}
-	swap(chromosome[rand() % weighedPopulation.size()], chromosome[rand() % weighedPopulation.size()]);
+	swap((*chromosome)[rand() % weighedPopulation.size()], (*chromosome)[rand() % weighedPopulation.size()]);
 	recalcWeight(weighedPopulation, id);
 }
 

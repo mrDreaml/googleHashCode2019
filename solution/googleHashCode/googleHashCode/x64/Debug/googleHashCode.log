@@ -1,3 +1,4 @@
-﻿  googleHashCode.cpp
-C:\projects\hashCode2019\solution\googleHashCode\googleHashCode\googleHashCode.cpp(31,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+﻿  GeneticAlgorithm.cpp
+C:\projects\hashCode2019\solution\googleHashCode\googleHashCode\GeneticAlgorithm.cpp(4,34): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\projects\hashCode2019\solution\googleHashCode\googleHashCode\GeneticAlgorithm.cpp(12,31): warning C4018: '<': signed/unsigned mismatch
   googleHashCode.vcxproj -> C:\projects\hashCode2019\solution\googleHashCode\x64\Debug\googleHashCode.exe
