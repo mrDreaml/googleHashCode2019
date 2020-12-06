@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <chrono>
 
 #include "Common.h"
 #include "InputOutput.h"
@@ -29,6 +30,7 @@ void startServersBySubmitionData (unsigned int serversQ, vector<submitionResultN
 
 int main() {
     srand(time(NULL)); // allows to generate new random values
+
     totalFileInfo info;
     map<string, compileDataNode> compiledData;
     map<string, vector<string>> compiledDataDeps;
@@ -38,9 +40,13 @@ int main() {
     //parseOutputData(readFromFile(SUBMITION_FILE_PATH /*SELECTED_OUTPUT_FILE_PATH*/), submitionResults);
     //startServersBySubmitionData(info.serversQ, submitionResults, compiledData, compiledDataDeps);
 
+    auto timeStart = chrono::steady_clock::now();
     GeneticAlgorithm ga = GeneticAlgorithm(compiledData, compiledDataDeps, info.serversQ);
-    ga.start(100, 30);
+    ga.start(200, 50); // TODO: fix bug, if big population
+    auto timeEnd = chrono::steady_clock::now();
 
+
+    std::cout << "Time: " << chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeStart).count() << "ms" << std::endl;
     // vector<string> d = { "7", "c0 1" };
     //writeToFile(SELECTED_OUTPUT_FILE_PATH, d);
 }

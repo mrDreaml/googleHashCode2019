@@ -1,68 +1,77 @@
+#include <iostream>
+
 #include "GeneticAlgorithm.h"
 
 populationT GeneticAlgorithm::generatePopulation(unsigned int populationQ) {
-		int size = _compiledData.size();
 		populationT population;
+		vector<string> fileNames;
+		int size = _compiledData.size();
+		for (auto it = _compiledData.begin(); it != _compiledData.end(); it++) {
+			fileNames.push_back(it->first);
+		}
+
 		for (unsigned int p = 0; p < populationQ; p++) {
-			chromosomeT chromosome;
-			vector<string> fileNames;
-			for (auto it = _compiledData.begin(); it != _compiledData.end(); it++) {
-				fileNames.push_back(it->first);
-			}
 			for (unsigned int i = 0; i < size; i++) {
-				auto fileNameId = rand() % fileNames.size();
+				swap(fileNames[rand() % size], fileNames[rand() % size]);
+			}
+			chromosomeT chromosome;
+			for (unsigned int i = 0; i < size; i++) {
 				genT gen;
-				gen.fileName = fileNames[fileNameId];
+				gen.fileName = fileNames[i];
 				gen.serverId = rand() % _serversQ;
 				chromosome.push_back(gen);
-				swap(fileNames[fileNameId], fileNames.back());
-				fileNames.pop_back();
 			}
-			population.push_back(chromosome);
+			int weight = evaluationFunction(chromosome);
+			if (weight != EMPTY) {
+				chromosomeWithWeight cw;
+				cw.chromosome = chromosome;
+				cw.weight = weight;
+				population.push_back(cw);
+			}
 		}
 		return population;
 }
 
 int GeneticAlgorithm::evaluationFunction(chromosomeT& chromosome) {
 	ServerManager sManager(_serversQ);
-	try {
-		for (genT gen : chromosome) {
-			sManager.bindFileToServer(_compiledData[gen.fileName], gen.serverId, _compiledData, _compiledDataDeps);
+	for (genT gen : chromosome) {
+		bool isBinded = sManager.bindFileToServer(_compiledData[gen.fileName], gen.serverId, _compiledData, _compiledDataDeps);
+		if (!isBinded) {
+			return EMPTY;
 		}
-	}
-	catch (...) {
-		return EMPTY;
 	}
 	return sManager.calcSummaryScore();
 }
 
-void GeneticAlgorithm::recalcWeight(weighedPopulationT& weighedPopulation, unsigned int id) {
-	chromosomeWithWeight* selected = &weighedPopulation[id];
+void GeneticAlgorithm::recalcWeight(populationT& population, unsigned int id) {
+	chromosomeWithWeight* selected = &population[id];
 	int weight = evaluationFunction(selected->chromosome);
 	if (weight != EMPTY) {
 		selected->weight = weight;
 	} else {
-		swap(*selected, weighedPopulation.back());
-		weighedPopulation.pop_back();
+		swap(*selected, population.back());
+		population.pop_back();
 	}
 }
 
-void GeneticAlgorithm::mutateSingle(weighedPopulationT& weighedPopulation) {
-	unsigned int id = rand() % weighedPopulation.size();
-	chromosomeWithWeight* selectedChromosome = &weighedPopulation[id];
+void GeneticAlgorithm::mutateSingle(populationT& population) {
+	unsigned int id = rand() % population.size();
+	chromosomeWithWeight* selectedChromosome = &population[id];
 	chromosomeT* chromosome = &selectedChromosome->chromosome;
 	for (genT& gen : *chromosome) {
 		if (rand() % 2 == 0) {
 			gen.serverId = rand() % _serversQ;
 		}
 	}
-	swap((*chromosome)[rand() % weighedPopulation.size()], (*chromosome)[rand() % weighedPopulation.size()]);
-	recalcWeight(weighedPopulation, id);
+	unsigned int swapId1 = rand() % chromosome->size();
+	unsigned int swapId2 = rand() % chromosome->size();
+	swap((*chromosome)[swapId1], (*chromosome)[swapId2]);
+	recalcWeight(population, id);
 }
 
-chromosomeWithWeight GeneticAlgorithm::getBestChromosome(weighedPopulationT& weighedPopulation) {
-	chromosomeWithWeight bestNode = weighedPopulation[0];
-	for (auto node : weighedPopulation) {
+chromosomeWithWeight GeneticAlgorithm::getBestChromosome(populationT& population) {
+	chromosomeWithWeight bestNode = population[0];
+	for (auto node : population) {
 		if (node.weight > bestNode.weight) {
 			bestNode = node;
 		}
@@ -78,26 +87,32 @@ GeneticAlgorithm::GeneticAlgorithm(map<string, compileDataNode> compiledData, ma
 
 void GeneticAlgorithm::start(unsigned int populationQ = 10, const unsigned int STARGANTION_PERIOD = 10) {
 	populationT population = generatePopulation(populationQ);
-	weighedPopulationT weighedPopulation;
-	for (auto chromosome : population) {
-		int weight = evaluationFunction(chromosome);
-		if (weight != EMPTY) {
-			chromosomeWithWeight cw;
-			cw.chromosome = chromosome;
-			cw.weight = weight;
-			weighedPopulation.push_back(cw);
-		}
-	}
 	unsigned int stagnationPeriod = 0;
-	chromosomeWithWeight bestNode = getBestChromosome(weighedPopulation);
+	if (population.size() == 0) {
+		return;
+	}
+	chromosomeWithWeight bestNode = getBestChromosome(population);
+	cout << "\nq:" << population.size() << endl;
 	while (stagnationPeriod < STARGANTION_PERIOD) {
-		mutateSingle(weighedPopulation);
-		chromosomeWithWeight currentNode = getBestChromosome(weighedPopulation);
+		for (unsigned int i = 0; i < population.size(); i++) {
+			if (rand() % 2 == 0) {
+				mutateSingle(population);
+			}
+		}
+		if (population.size() == 0) {
+			break;
+		}
+		chromosomeWithWeight currentNode = getBestChromosome(population);
 		if (bestNode.weight >= currentNode.weight) {
 			stagnationPeriod++;
 		} else {
+			cout << "\n+++\n";
 			bestNode = currentNode;
 			stagnationPeriod = 0;
 		}
 	}
+	bestNode;
+	std::cout << "\nGeneteic result:\n";
+	cout << "final population: " << population.size() << endl;
+	cout << "best score: " << bestNode.weight << endl;
 }

@@ -10,8 +10,7 @@
 struct genT { unsigned int serverId = 0; string fileName; };
 typedef vector<genT> chromosomeT;
 struct chromosomeWithWeight { chromosomeT chromosome; int weight; };
-typedef vector<chromosomeT> populationT;
-typedef vector<chromosomeWithWeight> weighedPopulationT;
+typedef vector<chromosomeWithWeight> populationT;
 
 class GeneticAlgorithm
 {
@@ -22,10 +21,10 @@ class GeneticAlgorithm
 private:
 	populationT generatePopulation(unsigned int populationQ);
 	int evaluationFunction(chromosomeT& chromosome);
-	void recalcWeight(weighedPopulationT& weighedPopulation, unsigned int);
-	void crossover(weighedPopulationT& weighedPopulation);
-	void mutateSingle(weighedPopulationT& weightPopulation);
-	chromosomeWithWeight getBestChromosome(weighedPopulationT& weightPopulation);
+	void recalcWeight(populationT& weighedPopulation, unsigned int);
+	void crossover(populationT& weighedPopulation);
+	void mutateSingle(populationT& weightPopulation);
+	chromosomeWithWeight getBestChromosome(populationT& weightPopulation);
 public:
 	GeneticAlgorithm(map<string, compileDataNode> compiledData, map<string, vector<string>> compiledDataDeps, unsigned int serversQ);
 	void start(unsigned int populationQ, unsigned int stagnationPeriod);
