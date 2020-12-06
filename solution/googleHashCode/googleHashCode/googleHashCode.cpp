@@ -42,11 +42,11 @@ int main() {
 
     auto timeStart = chrono::steady_clock::now();
     GeneticAlgorithm ga = GeneticAlgorithm(compiledData, compiledDataDeps, info.serversQ);
-    ga.start(200, 50); // TODO: fix bug, if big population
+    ga.start(15, 10); // TODO: fix bug, if big population
     auto timeEnd = chrono::steady_clock::now();
 
-
-    std::cout << "Time: " << chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeStart).count() << "ms" << std::endl;
+    std::cout << "\n_________________________\n";
+    std::cout << "time: " << chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeStart).count() << "ms" << std::endl;
     // vector<string> d = { "7", "c0 1" };
     //writeToFile(SELECTED_OUTPUT_FILE_PATH, d);
 }

@@ -27,6 +27,8 @@ populationT GeneticAlgorithm::generatePopulation(unsigned int populationQ) {
 				cw.chromosome = chromosome;
 				cw.weight = weight;
 				population.push_back(cw);
+			} else {
+				p--;
 			}
 		}
 		return population;
@@ -43,17 +45,6 @@ int GeneticAlgorithm::evaluationFunction(chromosomeT& chromosome) {
 	return sManager.calcSummaryScore();
 }
 
-void GeneticAlgorithm::recalcWeight(populationT& population, unsigned int id) {
-	chromosomeWithWeight* selected = &population[id];
-	int weight = evaluationFunction(selected->chromosome);
-	if (weight != EMPTY) {
-		selected->weight = weight;
-	} else {
-		swap(*selected, population.back());
-		population.pop_back();
-	}
-}
-
 void GeneticAlgorithm::mutateSingle(populationT& population) {
 	unsigned int id = rand() % population.size();
 	chromosomeWithWeight* selectedChromosome = &population[id];
@@ -66,7 +57,12 @@ void GeneticAlgorithm::mutateSingle(populationT& population) {
 	unsigned int swapId1 = rand() % chromosome->size();
 	unsigned int swapId2 = rand() % chromosome->size();
 	swap((*chromosome)[swapId1], (*chromosome)[swapId2]);
-	recalcWeight(population, id);
+	int weight = evaluationFunction(*chromosome);
+	if (weight != EMPTY) {
+		selectedChromosome->weight = weight;
+	} else {
+		mutateSingle(population);
+	}
 }
 
 chromosomeWithWeight GeneticAlgorithm::getBestChromosome(populationT& population) {
@@ -93,6 +89,7 @@ void GeneticAlgorithm::start(unsigned int populationQ = 10, const unsigned int S
 	}
 	chromosomeWithWeight bestNode = getBestChromosome(population);
 	cout << "\nq:" << population.size() << endl;
+	cout << "best score: " << bestNode.weight << endl;
 	while (stagnationPeriod < STARGANTION_PERIOD) {
 		for (unsigned int i = 0; i < population.size(); i++) {
 			if (rand() % 2 == 0) {
@@ -106,7 +103,7 @@ void GeneticAlgorithm::start(unsigned int populationQ = 10, const unsigned int S
 		if (bestNode.weight >= currentNode.weight) {
 			stagnationPeriod++;
 		} else {
-			cout << "\n+++\n";
+			cout << "\n+ Mutation create new best score:" << currentNode.weight << endl;
 			bestNode = currentNode;
 			stagnationPeriod = 0;
 		}

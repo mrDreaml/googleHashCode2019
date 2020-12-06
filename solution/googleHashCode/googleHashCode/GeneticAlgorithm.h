@@ -21,7 +21,6 @@ class GeneticAlgorithm
 private:
 	populationT generatePopulation(unsigned int populationQ);
 	int evaluationFunction(chromosomeT& chromosome);
-	void recalcWeight(populationT& weighedPopulation, unsigned int);
 	void crossover(populationT& weighedPopulation);
 	void mutateSingle(populationT& weightPopulation);
 	chromosomeWithWeight getBestChromosome(populationT& weightPopulation);
