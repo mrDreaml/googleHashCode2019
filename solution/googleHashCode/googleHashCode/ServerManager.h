@@ -12,9 +12,9 @@ private:
     vector<Server> servers;
 public:
     ServerManager(unsigned int serversQ);
-    unsigned int calcSummaryScore();
+    unsigned long int calcSummaryScore();
     vector<unsigned int> getServersTime();
-    bool bindFileToServer(compileDataNode& file, unsigned int serverId, map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps);
-    int calculateReplicationTime(const string fileName, unsigned int serverId, map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps);
+    void bindFileToServer(compileDataNode& file, unsigned int serverId, map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps);
+    long int calculateReplicationTime(const string fileName, unsigned int serverId, map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps);
 };
 

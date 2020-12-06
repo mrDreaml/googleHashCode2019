@@ -10,7 +10,7 @@ using namespace std;
 
 struct scoreNode {
 	string name;
-	unsigned int score;
+	unsigned long int score;
 };
 
 class Server {
@@ -24,5 +24,5 @@ public:
 	bool isServerContainFile(string fileName);
 	unsigned int getReplicationTimeForFile(string fileName, unsigned int);
 	void bindFile(compileDataNode& file, unsigned int replicationTotalTime);
-	unsigned int calcSummuryScore();
+	unsigned long int calcSummuryScore();
 };

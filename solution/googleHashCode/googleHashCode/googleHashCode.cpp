@@ -9,7 +9,7 @@
 #include "ServerManager.h"
 #include "GeneticAlgorithm.h"
 
-const string SELECTED_INPUT_FILE_PATH = "..//inputData//a_example.in";
+const string SELECTED_INPUT_FILE_PATH = "..//inputData//b.in";
 const string SELECTED_OUTPUT_FILE_PATH = "..//outputData/output.out";
 const string SUBMITION_FILE_PATH = "..//outputData//submitionExample.out";
 
@@ -34,15 +34,16 @@ int main() {
     totalFileInfo info;
     map<string, compileDataNode> compiledData;
     map<string, vector<string>> compiledDataDeps;
-    parseInputData(readFromFile(SELECTED_INPUT_FILE_PATH), info, compiledData, compiledDataDeps);
+    vector<string> targetFiles;
+    parseInputData(readFromFile(SELECTED_INPUT_FILE_PATH), info, compiledData, compiledDataDeps, targetFiles);
 
     //vector<submitionResultNode> submitionResults;
     //parseOutputData(readFromFile(SUBMITION_FILE_PATH /*SELECTED_OUTPUT_FILE_PATH*/), submitionResults);
     //startServersBySubmitionData(info.serversQ, submitionResults, compiledData, compiledDataDeps);
 
     auto timeStart = chrono::steady_clock::now();
-    GeneticAlgorithm ga = GeneticAlgorithm(compiledData, compiledDataDeps, info.serversQ);
-    ga.start(15, 10); // TODO: fix bug, if big population
+    GeneticAlgorithm ga = GeneticAlgorithm(compiledData, compiledDataDeps, targetFiles, info.serversQ);
+    ga.start(1, 100, 10, 7);
     auto timeEnd = chrono::steady_clock::now();
 
     std::cout << "\n_________________________\n";
@@ -51,3 +52,4 @@ int main() {
     //writeToFile(SELECTED_OUTPUT_FILE_PATH, d);
 }
 
+// TODO: weight fixes! big N

@@ -4,7 +4,7 @@
 #include <sstream>
 #include <vector>
 
-
+#include <iostream>
 
 ServerManager::ServerManager(unsigned int serversQ) {
     for (unsigned int i = 0; i < serversQ; i++) {
@@ -13,11 +13,12 @@ ServerManager::ServerManager(unsigned int serversQ) {
     }
 };
 
-unsigned int ServerManager::calcSummaryScore() {
-    unsigned int summaryScore = 0;
+unsigned long int ServerManager::calcSummaryScore() {
+    unsigned long int summaryScore = 0;
     for (Server server : servers) {
         summaryScore += server.calcSummuryScore();
     }
+
     return summaryScore;
 }
 
@@ -29,18 +30,18 @@ vector<unsigned int> ServerManager::getServersTime() {
     return result;
 }
 
-bool ServerManager::bindFileToServer (compileDataNode& file, unsigned int serverId, map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps) {
-    unsigned int replicationTotalTime = calculateReplicationTime(file.name, serverId, compiledData, compiledDataDeps);
+void ServerManager::bindFileToServer (compileDataNode& file, unsigned int serverId, map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps) {
+    long int replicationTotalTime = calculateReplicationTime(file.name, serverId, compiledData, compiledDataDeps);
     if (replicationTotalTime != EMPTY) {
         servers[serverId].bindFile(file, replicationTotalTime);
-        return true;
+    } else {
+        throw "file can't be binded!";
     }
-    return false;
 }
 
-int ServerManager::calculateReplicationTime(const string fileName, unsigned int serverId, map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps) {
+long int ServerManager::calculateReplicationTime(const string fileName, unsigned int serverId, map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps) {
     vector<string>* deps = &compiledDataDeps[fileName];
-    unsigned int replicationTime = 0;
+    unsigned long int replicationTime = 0;
     for (string depFileName : *deps) {
         int currentFileReplicationTime = EMPTY;
         for (unsigned int i = 0; i < servers.size(); i++) {

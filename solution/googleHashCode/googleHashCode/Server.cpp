@@ -42,10 +42,11 @@ void Server::bindFile (compileDataNode &file, unsigned int replicationTotalTime)
 	replicationDeadLine[file.name] = serverTime + file.replicateTime;
 }
 
-unsigned int Server::calcSummuryScore() {
-	unsigned int res = 0;
+unsigned long int Server::calcSummuryScore() {
+	unsigned long int res = 0;
 	for (auto s : compiledFiles) {
 		res += s.score;
 	}
+
 	return res;
 }

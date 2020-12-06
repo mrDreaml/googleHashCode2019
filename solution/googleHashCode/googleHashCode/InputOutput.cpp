@@ -33,7 +33,7 @@ vector<string> getStringTokens(string& line) {
     return tokens;
 }
 
-void parseInputData(const vector<string>& inputFileData, totalFileInfo& info, map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps) {
+void parseInputData(const vector<string>& inputFileData, totalFileInfo& info, map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps, vector<string>& targetFiles) {
     unsigned int i = 0;
     compileDataNode node;
     string fileName;
@@ -62,6 +62,7 @@ void parseInputData(const vector<string>& inputFileData, totalFileInfo& info, ma
         }
         else {
             compileDataNode* currentNode = &compiledData[tokens[0]];
+            targetFiles.push_back(currentNode->name);
             currentNode->deadlineTime = stoi(tokens[1]);
             currentNode->goalPoints = stoi(tokens[2]);
         }

@@ -2,67 +2,152 @@
 
 #include "GeneticAlgorithm.h"
 
+vector<unsigned int> generateRandRange(unsigned int size) {
+	vector<unsigned int> res;
+	for (unsigned int i = 0; i < size; i++) {
+		res.push_back(i);
+	}
+	for (unsigned int i = 0; i < size; i++) {
+		swap(res[rand() % size], res[rand() % size]);
+	}
+	return res;
+}
+
+void generateGroupOfDeth(dethList& root, groupOfFileNames& currentDethFileNames, map<string, vector<string>>& deps) {
+	root.push_back(currentDethFileNames);
+	groupOfFileNames nextDeth;
+	for (string fileName : currentDethFileNames) {
+		for (string depFileName : deps[fileName]) {
+			nextDeth.push_back(depFileName);
+		}
+	}
+	if (nextDeth.size() != 0) {
+		return generateGroupOfDeth(root, nextDeth, deps);
+	}
+}
+
 populationT GeneticAlgorithm::generatePopulation(unsigned int populationQ) {
 		populationT population;
-		vector<string> fileNames;
-		int size = _compiledData.size();
-		for (auto it = _compiledData.begin(); it != _compiledData.end(); it++) {
-			fileNames.push_back(it->first);
-		}
+		groupOfDeths groupedSolutions;
 
+		for (string targetFileName : _targetFiles) {
+			dethList deths;
+			groupOfFileNames rootNode = { targetFileName };
+			generateGroupOfDeth(deths, rootNode, _compiledDataDeps);
+			reverse(deths.begin(), deths.end());
+			groupedSolutions.push_back(deths);
+		}
+		
 		for (unsigned int p = 0; p < populationQ; p++) {
-			for (unsigned int i = 0; i < size; i++) {
-				swap(fileNames[rand() % size], fileNames[rand() % size]);
-			}
 			chromosomeT chromosome;
-			for (unsigned int i = 0; i < size; i++) {
-				genT gen;
-				gen.fileName = fileNames[i];
-				gen.serverId = rand() % _serversQ;
-				chromosome.push_back(gen);
+			map<string, bool> compiled;
+			for (auto solutionId : generateRandRange(groupedSolutions.size())) {
+				for (groupOfFileNames fileNames : groupedSolutions[solutionId]) {
+					string targetFileName;
+					auto fileNamesSize = fileNames.size();
+					if (fileNamesSize != 0) {
+						for (auto id : generateRandRange(fileNamesSize)) {
+							targetFileName = fileNames[id];
+							if (!compiled[targetFileName]) {
+								genT gen;
+								compiled[targetFileName] = true;
+								gen.fileName = targetFileName;
+								gen.serverId = rand() % _serversQ;
+								chromosome.push_back(gen);
+							}
+						}
+					} else {
+						targetFileName = fileNames[0];
+						if (!compiled[targetFileName]) {
+							genT gen;
+							compiled[targetFileName] = true;
+							gen.fileName = targetFileName;
+							gen.serverId = rand() % _serversQ;
+							chromosome.push_back(gen);
+						}
+					}
+				}
 			}
-			int weight = evaluationFunction(chromosome);
-			if (weight != EMPTY) {
-				chromosomeWithWeight cw;
-				cw.chromosome = chromosome;
-				cw.weight = weight;
-				population.push_back(cw);
-			} else {
-				p--;
+			unsigned long int weight;
+			try {
+				weight = evaluationFunction(chromosome);
+			} catch (...) {
+				continue;
 			}
+			cout << weight << endl;
+			chromosomeWithWeight cw;
+			cw.chromosome = chromosome;
+			cw.weight = weight;
+			population.push_back(cw);
 		}
 		return population;
 }
 
-int GeneticAlgorithm::evaluationFunction(chromosomeT& chromosome) {
+unsigned long int GeneticAlgorithm::evaluationFunction(chromosomeT& chromosome) {
 	ServerManager sManager(_serversQ);
 	for (genT gen : chromosome) {
-		bool isBinded = sManager.bindFileToServer(_compiledData[gen.fileName], gen.serverId, _compiledData, _compiledDataDeps);
-		if (!isBinded) {
-			return EMPTY;
-		}
+		sManager.bindFileToServer(_compiledData[gen.fileName], gen.serverId, _compiledData, _compiledDataDeps);
 	}
 	return sManager.calcSummaryScore();
 }
 
+void GeneticAlgorithm::selection(populationT& population, unsigned int selectionQ) {
+	population;
+	sort(population.begin(), population.end(), weightComparator);
+	auto size = population.size();
+	int d = size - (rand() % selectionQ);
+	if (d > 0) {
+		population.resize(d);
+	}
+	population;
+}
+
+void GeneticAlgorithm::crossover(populationT& population) {
+	chromosomeWithWeight* parent1 = &population[rand() % population.size()];
+	chromosomeWithWeight* parent2 = &population[rand() % population.size()];
+	chromosomeT childChromosome;
+	for (unsigned int i = 0; i < parent1->chromosome.size(); i++) {
+		if (rand() % 2 == 0) {
+			childChromosome.push_back(parent1->chromosome[i]);
+		} else {
+			childChromosome.push_back(parent2->chromosome[i]);
+		}
+	}
+	unsigned long int weight;
+	try {
+		weight = evaluationFunction(childChromosome);
+	}
+	catch (...) { return;  }
+	chromosomeWithWeight child;
+	child.weight = weight;
+	child.chromosome = childChromosome;
+	cout << "+ crossover, weight:" << weight << endl;
+	population.push_back(child);
+}
+
 void GeneticAlgorithm::mutateSingle(populationT& population) {
-	unsigned int id = rand() % population.size();
+	unsigned int id = 0;
 	chromosomeWithWeight* selectedChromosome = &population[id];
-	chromosomeT* chromosome = &selectedChromosome->chromosome;
-	for (genT& gen : *chromosome) {
+	chromosomeT chromosome = selectedChromosome->chromosome;
+	for (genT& gen : chromosome) {
 		if (rand() % 2 == 0) {
 			gen.serverId = rand() % _serversQ;
 		}
 	}
-	unsigned int swapId1 = rand() % chromosome->size();
-	unsigned int swapId2 = rand() % chromosome->size();
-	swap((*chromosome)[swapId1], (*chromosome)[swapId2]);
-	int weight = evaluationFunction(*chromosome);
-	if (weight != EMPTY) {
-		selectedChromosome->weight = weight;
-	} else {
-		mutateSingle(population);
+	unsigned int swapId1 = rand() % chromosome.size();
+	unsigned int swapId2 = rand() % chromosome.size();
+	swap(chromosome[swapId1], chromosome[swapId2]);
+	unsigned long int weight;
+	try {
+		weight = evaluationFunction(chromosome);
 	}
+	catch (...) { return; }
+
+	cout << "+ mutation, weight: " << weight << endl;
+	population[id];
+	selectedChromosome;
+	selectedChromosome->weight = weight;
+	selectedChromosome->chromosome = chromosome;
 }
 
 chromosomeWithWeight GeneticAlgorithm::getBestChromosome(populationT& population) {
@@ -75,13 +160,7 @@ chromosomeWithWeight GeneticAlgorithm::getBestChromosome(populationT& population
 	return bestNode;
 }
 
-GeneticAlgorithm::GeneticAlgorithm(map<string, compileDataNode> compiledData, map<string, vector<string>> compiledDataDeps, unsigned int serversQ) {
-		_compiledData = compiledData;
-		_compiledDataDeps = compiledDataDeps;
-		_serversQ = serversQ;
-}
-
-void GeneticAlgorithm::start(unsigned int populationQ = 10, const unsigned int STARGANTION_PERIOD = 10) {
+void GeneticAlgorithm::start(const unsigned int populationQ, const unsigned int STARGANTION_PERIOD, const unsigned int SELECTION_Q, const unsigned int SELECTION_PERIOD) {
 	populationT population = generatePopulation(populationQ);
 	unsigned int stagnationPeriod = 0;
 	if (population.size() == 0) {
@@ -90,10 +169,16 @@ void GeneticAlgorithm::start(unsigned int populationQ = 10, const unsigned int S
 	chromosomeWithWeight bestNode = getBestChromosome(population);
 	cout << "\nq:" << population.size() << endl;
 	cout << "best score: " << bestNode.weight << endl;
-	while (stagnationPeriod < STARGANTION_PERIOD) {
+	unsigned int p = 0;
+	while (stagnationPeriod < STARGANTION_PERIOD && population.size() != 0) {
+		if (p % SELECTION_PERIOD == 0) {
+			selection(population, SELECTION_Q);
+		}
 		for (unsigned int i = 0; i < population.size(); i++) {
 			if (rand() % 2 == 0) {
 				mutateSingle(population);
+			} else {
+				crossover(population);
 			}
 		}
 		if (population.size() == 0) {
@@ -103,13 +188,20 @@ void GeneticAlgorithm::start(unsigned int populationQ = 10, const unsigned int S
 		if (bestNode.weight >= currentNode.weight) {
 			stagnationPeriod++;
 		} else {
-			cout << "\n+ Mutation create new best score:" << currentNode.weight << endl;
 			bestNode = currentNode;
+			cout << "\nBetter: " << bestNode.weight;
 			stagnationPeriod = 0;
 		}
+		p++;
 	}
-	bestNode;
 	std::cout << "\nGeneteic result:\n";
 	cout << "final population: " << population.size() << endl;
 	cout << "best score: " << bestNode.weight << endl;
+}
+
+GeneticAlgorithm::GeneticAlgorithm(map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps, vector<string>& targetFiles, unsigned int serversQ) {
+	_compiledData = compiledData;
+	_compiledDataDeps = compiledDataDeps;
+	_targetFiles = targetFiles;
+	_serversQ = serversQ;
 }
