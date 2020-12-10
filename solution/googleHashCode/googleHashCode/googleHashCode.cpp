@@ -9,7 +9,7 @@
 #include "ServerManager.h"
 #include "GeneticAlgorithm.h"
 
-const string SELECTED_INPUT_FILE_PATH = "..//inputData//b.in";
+const string SELECTED_INPUT_FILE_PATH = "..//inputData//a.in";
 const string SELECTED_OUTPUT_FILE_PATH = "..//outputData/output.out";
 const string SUBMITION_FILE_PATH = "..//outputData//submitionExample.out";
 
@@ -17,7 +17,7 @@ const string SUBMITION_FILE_PATH = "..//outputData//submitionExample.out";
 void startServersBySubmitionData (unsigned int serversQ, vector<submitionResultNode> submitionResults, map<string, compileDataNode> compiledData, map<string, vector<string>> compiledDataDeps) {
     ServerManager sManager(serversQ);
     for (submitionResultNode submitionResult : submitionResults) {
-        sManager.bindFileToServer(compiledData[submitionResult.name], submitionResult.serverId, compiledData, compiledDataDeps);
+        sManager.bindFileToServer(compiledData[submitionResult.fileName], submitionResult.serverId, compiledData, compiledDataDeps);
     }
     cout << "Score: " << sManager.calcSummaryScore() << endl;
     int serverId = 0;
@@ -27,6 +27,15 @@ void startServersBySubmitionData (unsigned int serversQ, vector<submitionResultN
     sManager;
 }
 
+string submitionResultToString(vector<submitionResultNode>& data) {
+    stringstream concat;
+    concat << data.size() << endl;
+    for (submitionResultNode& node : data) {
+        concat << node.fileName << " " << node.serverId << endl;
+    }
+
+    return concat.str();
+}
 
 int main() {
     srand(time(NULL)); // allows to generate new random values
@@ -38,12 +47,13 @@ int main() {
     parseInputData(readFromFile(SELECTED_INPUT_FILE_PATH), info, compiledData, compiledDataDeps, targetFiles);
 
     //vector<submitionResultNode> submitionResults;
-    //parseOutputData(readFromFile(SUBMITION_FILE_PATH /*SELECTED_OUTPUT_FILE_PATH*/), submitionResults);
+    //parseOutputData(readFromFile(SUBMITION_FILE_PATH), submitionResults);
     //startServersBySubmitionData(info.serversQ, submitionResults, compiledData, compiledDataDeps);
 
     auto timeStart = chrono::steady_clock::now();
     GeneticAlgorithm ga = GeneticAlgorithm(compiledData, compiledDataDeps, targetFiles, info.serversQ);
-    ga.start(1, 100, 10, 7);
+    vector<submitionResultNode> res = ga.start(10, 30, 5, 5);
+    std::cout << submitionResultToString(res);
     auto timeEnd = chrono::steady_clock::now();
 
     std::cout << "\n_________________________\n";

@@ -76,7 +76,7 @@ unsigned int parseOutputData(const vector<string>& fileData, vector<submitionRes
         string line = *it;
         vector<string> tokens = getStringTokens(line);
         submitionResultNode node;
-        node.name = tokens[0];
+        node.fileName = tokens[0];
         node.serverId = stoi(tokens[1]);
         submitionResult.push_back(node);
     }

@@ -1,9 +1,3 @@
-﻿  GeneticAlgorithm.cpp
-C:\projects\hashCode2019\solution\googleHashCode\googleHashCode\GeneticAlgorithm.cpp(44,69): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\projects\hashCode2019\solution\googleHashCode\googleHashCode\GeneticAlgorithm.cpp(49,54): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\projects\hashCode2019\solution\googleHashCode\googleHashCode\GeneticAlgorithm.cpp(98,38): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\projects\hashCode2019\solution\googleHashCode\googleHashCode\GeneticAlgorithm.cpp(147,15): warning C4834: discarding return value of function with 'nodiscard' attribute
-  googleHashCode.cpp
-C:\projects\hashCode2019\solution\googleHashCode\googleHashCode\googleHashCode.cpp(32,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  Generating Code...
+﻿  googleHashCode.cpp
+C:\projects\hashCode2019\solution\googleHashCode\googleHashCode\googleHashCode.cpp(41,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   googleHashCode.vcxproj -> C:\projects\hashCode2019\solution\googleHashCode\x64\Debug\googleHashCode.exe

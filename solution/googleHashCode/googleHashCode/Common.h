@@ -20,7 +20,7 @@ struct compileDataNode {
 };
 
 struct submitionResultNode {
-    string name;
+    string fileName;
     unsigned int serverId;
 };
 

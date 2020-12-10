@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "GeneticAlgorithm.h"
 
 vector<unsigned int> generateRandRange(unsigned int size) {
@@ -99,7 +97,6 @@ void GeneticAlgorithm::selection(populationT& population, unsigned int selection
 	if (d > 0) {
 		population.resize(d);
 	}
-	population;
 }
 
 void GeneticAlgorithm::crossover(populationT& population) {
@@ -108,7 +105,7 @@ void GeneticAlgorithm::crossover(populationT& population) {
 	chromosomeT childChromosome;
 	for (unsigned int i = 0; i < parent1->chromosome.size(); i++) {
 		if (rand() % 2 == 0) {
-			childChromosome.push_back(parent1->chromosome[i]);
+			childChromosome.push_back(parent1->chromosome[i]); // mb clone?
 		} else {
 			childChromosome.push_back(parent2->chromosome[i]);
 		}
@@ -160,11 +157,12 @@ chromosomeWithWeight GeneticAlgorithm::getBestChromosome(populationT& population
 	return bestNode;
 }
 
-void GeneticAlgorithm::start(const unsigned int populationQ, const unsigned int STARGANTION_PERIOD, const unsigned int SELECTION_Q, const unsigned int SELECTION_PERIOD) {
+chromosomeT GeneticAlgorithm::start(const unsigned int populationQ, const unsigned int STARGANTION_PERIOD, const unsigned int SELECTION_Q, const unsigned int SELECTION_PERIOD) {
 	populationT population = generatePopulation(populationQ);
 	unsigned int stagnationPeriod = 0;
 	if (population.size() == 0) {
-		return;
+		chromosomeT empty;
+		return empty;
 	}
 	chromosomeWithWeight bestNode = getBestChromosome(population);
 	cout << "\nq:" << population.size() << endl;
@@ -177,10 +175,9 @@ void GeneticAlgorithm::start(const unsigned int populationQ, const unsigned int 
 		for (unsigned int i = 0; i < population.size(); i++) {
 			if (rand() % 2 == 0) {
 				mutateSingle(population);
-			} else {
-				crossover(population);
 			}
 		}
+		crossover(population);
 		if (population.size() == 0) {
 			break;
 		}
@@ -189,7 +186,7 @@ void GeneticAlgorithm::start(const unsigned int populationQ, const unsigned int 
 			stagnationPeriod++;
 		} else {
 			bestNode = currentNode;
-			cout << "\nBetter: " << bestNode.weight;
+			cout << "\nBetter: " << bestNode.weight << endl;
 			stagnationPeriod = 0;
 		}
 		p++;
@@ -197,6 +194,7 @@ void GeneticAlgorithm::start(const unsigned int populationQ, const unsigned int 
 	std::cout << "\nGeneteic result:\n";
 	cout << "final population: " << population.size() << endl;
 	cout << "best score: " << bestNode.weight << endl;
+	return bestNode.chromosome;
 }
 
 GeneticAlgorithm::GeneticAlgorithm(map<string, compileDataNode>& compiledData, map<string, vector<string>>& compiledDataDeps, vector<string>& targetFiles, unsigned int serversQ) {
